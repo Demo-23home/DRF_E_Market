@@ -17,6 +17,7 @@ from .filters import ProductsFilter
 def list_products(request):
     filter_set = ProductsFilter(request.GET, queryset=Product.objects.all().order_by('id'))
     res_page = 2
+    count = filter_set.qs.count()
     paginator = PageNumberPagination()
     paginator.page_size = res_page
     queryset = paginator.paginate_queryset(filter_set.qs, request)
