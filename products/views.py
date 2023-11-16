@@ -1,14 +1,15 @@
 #Rest imports
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import IsAuthenticated
 #django imports
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 #internal imports
 from .models import Product
-from .serializers import ProductSerailzer
+from .serializers import ProductSerializer
 from .filters import ProductsFilter
 # Create your views here.
 
@@ -16,24 +17,72 @@ from .filters import ProductsFilter
 @api_view(['GET'])
 def list_products(request):
     filter_set = ProductsFilter(request.GET, queryset=Product.objects.all().order_by('id'))
-    res_page = 2
+    res_page = 12
     count = filter_set.qs.count()
     paginator = PageNumberPagination()
     paginator.page_size = res_page
     queryset = paginator.paginate_queryset(filter_set.qs, request)
-    serializer = ProductSerailzer(queryset, many=True)
+    serializer = ProductSerializer(queryset, many=True)
 
     json = {
         "Prodcuts":serializer.data
         }
     return Response(json, status=status.HTTP_200_OK)
 
+
+
 @api_view(['GET'])
-def list_product(request, pk):
+def get_product(request, pk):
     product = get_object_or_404(Product,id=pk)
-    serializer = ProductSerailzer(product)
+    serializer = ProductSerializer(product)
     # print(products)
     json = {
         "Prodcut":serializer.data
         }
     return Response(json, status=status.HTTP_200_OK)
+
+    
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def new_product(request):
+    serializer = ProductSerializer(data=request.data)
+
+    if serializer.is_valid():
+        product = serializer.save(user=request.user)
+        res_serializer = ProductSerializer(product, many=False)
+        return Response({"Product": res_serializer.data})
+    
+    return Response(serializer.errors)
+
+    
+
+
+@api_view(["PUT"])
+@permission_classes([IsAuthenticated])
+def update_product(request, pk):
+    product = get_object_or_404(Product,id=pk)
+
+    if product.user != request.user:
+        return Response({"Error":"you can't update this product"},status=status.HTTP_401_UNAUTHORIZED)
+    
+    product_serializer = ProductSerializer(instance=product, data=request.data, partial=True)
+
+    if not product_serializer.is_valid():
+        return Response({"Error":"not valid data"},status=status.HTTP_400_BAD_REQUEST)
+    
+    product_serializer.save()
+    return Response({"Product":product_serializer.data},status=status.HTTP_200_OK)
+
+
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_product(request, pk):
+    product = get_object_or_404(Product, id=pk)
+    product.delete()
+    if request.user == product.user:
+        product.delete
+        return Response({"Deleted":"your Product has been deleted"}, status=status.HTTP_200_OK)
+    return Response({"Error":"sorry you can't delete this product"}, status=status.HTTP_401_UNAUTHORIZED)
