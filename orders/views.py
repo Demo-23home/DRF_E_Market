@@ -1,7 +1,7 @@
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 #django imports
 from django.shortcuts import get_object_or_404 
 #internal imports
@@ -63,7 +63,7 @@ def get_order(request, pk):
 
 
 @api_view(['DELETE'])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated,IsAdminUser])
 def delete_order(request, pk):
     try:
         order = Order.objects.get(id=pk)
@@ -75,7 +75,7 @@ def delete_order(request, pk):
 
 
 @api_view(['PUT'])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated,IsAdminUser])
 def update_order(request,pk):
     try:
         order = Order.objects.get(id=pk)

@@ -3,7 +3,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 #django imports
 from django.shortcuts import get_object_or_404
 from django.db.models import Avg
@@ -59,7 +59,7 @@ def new_product(request):
 
 
 @api_view(["PUT"])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated,IsAdminUser])
 def update_product(request, pk):
     product = get_object_or_404(Product,id=pk)
 
@@ -78,7 +78,7 @@ def update_product(request, pk):
 
 
 @api_view(['DELETE'])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated,IsAdminUser])
 def delete_product(request, pk):
     product = get_object_or_404(Product, id=pk)
     product.delete()
@@ -123,7 +123,7 @@ def new_review(request, pk):
 
 
 @api_view(['DELETE'])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated,IsAdminUser])
 def delete_review(request, pk):
     user = request.user
     product = get_object_or_404(Product, id=pk)
