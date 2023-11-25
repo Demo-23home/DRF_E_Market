@@ -37,17 +37,18 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
-    "django.contrib.staticfiles",
-    #Internal Apps
+    "django.contrib.staticfiles",  # Include this only once
+    # Internal Apps
     "products",
     "accounts",
     "orders",
-    #External Apps
+    # External Apps
     "rest_framework",
     "rest_framework_simplejwt",
     "django_filters",
-
+    'drf_yasg',
 ]
+
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
