@@ -5,7 +5,6 @@ from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 #django imports
-from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 from django.db.models import Avg
 #internal imports

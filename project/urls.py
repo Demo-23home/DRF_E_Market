@@ -23,4 +23,5 @@ urlpatterns = [
     path('api/', include('products.urls')),
     path('accounts/', include('accounts.urls')),
     path('token/', TokenObtainPairView.as_view()),
+    path('orders/',include('orders.urls')),
 ]
